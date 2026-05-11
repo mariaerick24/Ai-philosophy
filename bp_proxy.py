@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-AI Philosophy — Proxy v13 (Production)
+AI Philosophy — Proxy v13 (Production / Flask)
 Deploy: Railway / Render
-API keys via environment variables.
 """
 
 import json
@@ -11,12 +10,16 @@ import time
 import io
 import os
 import requests
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from PIL import Image, ImageDraw, ImageFont
 
-# ── API keys desde variables de entorno (nunca hardcodeadas en producción) ──
+app = Flask(__name__)
+CORS(app)
+
 GEMINI_API_KEY  = os.environ.get("GEMINI_API_KEY", "")
 REPLICATE_TOKEN = os.environ.get("REPLICATE_TOKEN", "")
+PORT = int(os.environ.get("PORT", 5555))
 
 GEMINI_FLASH_URL = (
     "https://generativelanguage.googleapis.com/v1beta"
@@ -25,12 +28,10 @@ GEMINI_FLASH_URL = (
 REPLICATE_API = "https://api.replicate.com/v1"
 FLUX_MODEL    = "black-forest-labs/flux-schnell"
 
-PORT = int(os.environ.get("PORT", 5555))
-
 STYLES = {
     "flemish":     "Flemish Renaissance oil painting, rich jewel tones, dramatic chiaroscuro, intricate ornamental detail, Rubens and Van Eyck influence, monumental composition, aged impasto texture, deep shadows, luminous golden light, museum quality",
     "moreau":      "Gustave Moreau symbolist oil painting, mythological grandeur, dense ornamental surfaces, luminous jewel-like colors, dreamlike layered atmosphere, Pre-Raphaelite influence, mysterious narrative depth, jeweled figures, museum quality",
-    "cinema":      "CINEMATIC — detect the cinematic register the concept demands and build from there. Available registers: (1) NOIR: urban night, hard shadows, wet streets, moral ambiguity, Blade Runner / Se7en aesthetic; (2) EPIC/SUBLIME: vast landscape, golden hour, lone figure OR massive crowd OR animal migration, Terrence Malick / Roger Deakins; (3) INTIMATE DRAMA: close interior, window light, human face or animal in private moment, Wong Kar-wai / Alfonso Cuarón; (4) DYSTOPIAN/SCI-FI: cold industrial light, surveillance, dehumanized space, Tarkovsky / Children of Men; (5) NEOREALISM: raw street, available light, unposed crowd or community, Cassavetes / Bicycle Thieves; (6) PSYCHOLOGICAL THRILLER: claustrophobic space, destabilizing angle, dread in ordinary setting, Kubrick / Haneke; (7) POLITICAL DRAMA: collective protest, institutional power, masses vs system, Loach / Costa-Gavras / Eisenstein. SUBJECT RANGE — do not default to solitary human figure. Consider: animal subjects (single or herd), human collectives (crowds, communities, masses, families), non-human natural forces, urban multitudes, animal-human coexistence. CELESTIAL SUBJECTS: moon over city or landscape, star fields above human activity, night sky as philosophical backdrop. The concept dictates the subject and scale. Always: anamorphic lens, 35mm film grain, cinematic color grading.",
+    "cinema":      "CINEMATIC — detect the cinematic register the concept demands and build from there. Available registers: (1) NOIR: urban night, hard shadows, wet streets, moral ambiguity, Blade Runner / Se7en aesthetic; (2) EPIC/SUBLIME: vast landscape, golden hour, lone figure OR massive crowd OR animal migration, Terrence Malick / Roger Deakins; (3) INTIMATE DRAMA: close interior, window light, human face or animal in private moment, Wong Kar-wai / Alfonso Cuarón; (4) DYSTOPIAN/SCI-FI: cold industrial light, surveillance, dehumanized space, Tarkovsky / Children of Men; (5) NEOREALISM: raw street, available light, unposed crowd or community, Cassavetes / Bicycle Thieves; (6) PSYCHOLOGICAL THRILLER: claustrophobic space, destabilizing angle, dread in ordinary setting, Kubrick / Haneke; (7) POLITICAL DRAMA: collective protest, institutional power, masses vs system, Loach / Costa-Gavras / Eisenstein. SUBJECT RANGE: do not default to solitary human figure. Always: anamorphic lens, 35mm film grain, cinematic color grading.",
     "typographic": "stark typographic graphic design, bold serif display text as primary visual element, extreme high contrast black and white photography, editorial brutalist layout, Barbara Kruger influence, raw confrontational composition",
     "documentary": "documentary black and white photography, raw photojournalism, Cartier-Bresson decisive moment, Sebastião Salgado influence, heavy 35mm film grain, honest unfiltered natural light, street photography intimacy",
     "cosmic":      "vast cosmic scale photography, lone human figure dwarfed by universe, nebulae and deep star fields, Hubble Space Telescope aesthetic, sublime existential scale, monochrome figure against infinite color cosmos",
@@ -53,110 +54,53 @@ No resumes el concepto — lo abres. Buscas la contradicción interna, el proble
 CUATRO CAPAS QUE DEBES PRODUCIR:
 
 CAPA 1 — TENSIÓN (no tema, sino contradicción sin resolver)
-  No: "el tiempo"
-  Sí: "cosas que existen solo porque creemos en ellas, aunque nadie pueda probarlas"
-  No: "la justicia"  
-  Sí: "sistemas diseñados para proteger que terminan protegiendo solo a quienes los diseñaron"
-
 CAPA 2 — ANCLAJE (filósofo, texto, o concepto técnico específico)
-  No para citar — para tener coordenadas precisas.
-  Ejemplos válidos: Sorel/mito político, Benjamin/estado de excepción, 
-  Simone Weil/affliction, Fanon/colonialismo interiorizado, 
-  Arendt/banalidad del mal, Bourdieu/violencia simbólica,
-  Wittgenstein/límites del lenguaje, Camus/absurdo, etc.
-
-CAPA 3 — SUJETO (quién o qué porta la tensión visualmente)
-  Elige uno — el que la tensión pide, no el más obvio:
-  - colectivo_en_tension: multitud, fila, grupo fragmentado, masa
-  - animal: un animal como protagonista filosófico (no decorativo)
-  - objeto_espacio: lugar o cosa sin figura humana
-  - celeste: escala no-humana, cosmos, fenómeno natural
-  - dualidad: par en tensión, dos elementos opuestos
-  - monumental: escultura, arquitectura, obra de arte, monumento —
-    el objeto cultural como portador de la tensión filosófica.
-    Válido cuando el concepto tiene peso histórico, estético o civilizatorio.
-    Ejemplos: una estatua sin cabeza, una catedral vacía, un fresco deteriorado,
-    un arco triunfal abandonado, una escultura inacabada, un mural borrado.
-  - figura_individual: solo cuando la tensión es genuinamente sobre la soledad interior
-  
-  REGLA: figura_individual es el último recurso, no el primero.
-
-CAPA 4 — TERRITORIO
-  sublime | cotidiano | sociopolítico
-  El que la tensión pide, no el más fotogénico.
+CAPA 3 — SUJETO:
+  - colectivo_en_tension, animal, objeto_espacio, celeste, dualidad, monumental, figura_individual
+  REGLA: figura_individual es el último recurso.
+CAPA 4 — TERRITORIO: sublime | cotidiano | sociopolítico
 
 REGISTRO EMOCIONAL — REGLA ESPECIAL:
-Cuando el concepto tiene carga humana directa (madre, hijo, infancia, duelo,
-amor, cuerpo, pérdida, familia, vínculo, nacimiento, vejez, ternura):
-  - Priorizar drama íntimo sobre drama político o institucional
-  - Territorio cotidiano o sublime emocional ANTES que sociopolítico
-  - La escala humana antes que la escala institucional
-  - Si el registro es cinematográfico → sub-registro INTIMATE DRAMA:
-    Wong Kar-wai / Alfonso Cuarón / Abbas Kiarostami — NO Loach / Eisenstein
-  - La tensión filosófica debe surgir del vínculo, no de la estructura social
-  - El subtítulo puede ser provocativo o emotivo — no solo conceptual
+Cuando el concepto tiene carga humana directa (madre, hijo, duelo, amor, familia):
+  - Drama íntimo antes que político
+  - Cotidiano o sublime emocional antes que sociopolítico
+  - Cinematográfico → sub-registro INTIMATE DRAMA: Wong Kar-wai / Cuarón / Kiarostami
 
 Responde SOLO con JSON válido, sin markdown:
 {
-  "tension": "la contradicción sin resolver, en una frase larga y específica",
-  "anchor": "Filósofo/Concepto — una línea de contexto",
+  "tension": "la contradicción sin resolver",
+  "anchor": "Filósofo/Concepto — contexto",
   "subject": "colectivo_en_tension|animal|objeto_espacio|celeste|dualidad|monumental|figura_individual",
-  "subject_note": "descripción concreta de qué sujeto específico — 10 palabras máximo",
+  "subject_note": "descripción concreta — 10 palabras máximo",
   "territory": "sublime|cotidiano|sociopolítico",
-  "core": "núcleo filosófico en español — una línea, no descripción sino apertura"
+  "core": "núcleo filosófico en español — una línea"
 }"""
 
 IMAGE_SYSTEM = """Eres el constructor visual de AI Philosophy.
 
-Recibes una tensión filosófica estructurada en 4 capas y debes producir:
-1. Un IMAGE PROMPT técnico y concreto para Flux Schnell
-2. Un SUBTITLE que funcione como fractura, no como descripción
-
 REGLAS DEL IMAGE PROMPT:
-- Concreto y específico — sin adjetivos abstractos ("profound", "meaningful", "deep")
-- Describe luz, composición, sujeto, atmósfera con precisión cinematográfica
-- El sujeto viene dado — úsalo. No lo reemplaces por figura solitaria masculina por default
-- El registro visual viene dado — aplícalo
-- Sin texto en la imagen
+- Concreto y específico — sin adjetivos abstractos
 - Mínimo 80 palabras
+- Sin texto en la imagen
 
 ILUMINACIÓN — evitar por defecto:
-- luz dorada de atardecer como solución estética fácil
-- sol visible en frame como elemento dramático
-- cielo naranja/dorado como fondo
-Preferir según lo que el concepto pide, no lo que el modelo prefiere:
-luz difusa, overcast, interior, nocturna, contraluz frío,
-neblina, luz artificial, amanecer frío, sombra dura urbana.
-La luz dorada solo si el concepto la justifica explícitamente.
+- luz dorada de atardecer, sol visible en frame, cielo naranja/dorado
+Preferir: luz difusa, overcast, interior, nocturna, contraluz frío, neblina, luz artificial.
 
 REGLAS DEL SUBTITLE:
 - Máximo 12 palabras
-- NO describe lo que se ve en la imagen
-- NO es una cita de filósofo
-- Abre una grieta — algo que interrumpe, no que cierra
-- Debe poder existir sin la imagen
-- La imagen debe poder existir sin el subtítulo
-- Juntos crean un tercer significado que ninguno tiene solo
-
-EJEMPLOS DE SUBTÍTULOS QUE FUNCIONAN:
-  "What holds us together may be what never happened."
-  "The line moves forward. No one remembers why."
-  "We inherited the wound. We also inherited the silence."
-  "It was called order. It looked exactly like this."
-
-EJEMPLOS QUE NO FUNCIONAN:
-  "The enduring echo of foundational tales." — poético pero descriptivo, cierra
-  "Time passes and we forget." — genérico, sin filo
-  "In the shadow of ancient structures..." — describe la imagen
+- NO describe la imagen — abre una grieta
+- Ejemplo bueno: "The line moves forward. No one remembers why."
+- Ejemplo malo: "The enduring echo of foundational tales." — descriptivo, cierra
 
 Responde SOLO con JSON válido, sin markdown:
 {
-  "prompt": "image prompt técnico completo en inglés para Flux Schnell — mínimo 80 palabras",
-  "subtitle": "subtítulo en inglés — fractura, no descripción — máximo 12 palabras"
+  "prompt": "image prompt técnico en inglés — mínimo 80 palabras",
+  "subtitle": "subtítulo en inglés — fractura — máximo 12 palabras"
 }"""
 
 
-def expand_concept(concept: str) -> dict:
+def expand_concept(concept):
     resp = requests.post(
         f"{GEMINI_FLASH_URL}?key={GEMINI_API_KEY}",
         headers={"Content-Type": "application/json"},
@@ -168,24 +112,24 @@ def expand_concept(concept: str) -> dict:
         timeout=30,
     )
     if resp.status_code != 200:
-        raise Exception(f"Gemini expander error {resp.status_code}: {resp.text[:200]}")
+        raise Exception(f"Gemini expander error {resp.status_code}")
     text = resp.json()["candidates"][0]["content"]["parts"][0]["text"]
     return json.loads(text.replace("```json", "").replace("```", "").strip())
 
 
-def build_image_prompt(expanded: dict, style: str, subtitle_override: str) -> dict:
+def build_image_prompt(expanded, style, subtitle_override):
     style_desc = STYLES.get(style, STYLES["cinema"])
     user_msg = (
-        f"TENSIÓN FILOSÓFICA: {expanded['tension']}\n"
+        f"TENSIÓN: {expanded['tension']}\n"
         f"ANCLAJE: {expanded['anchor']}\n"
         f"SUJETO: {expanded['subject']} — {expanded['subject_note']}\n"
         f"TERRITORIO: {expanded['territory']}\n"
-        f"REGISTRO VISUAL: {style_desc}\n"
+        f"REGISTRO: {style_desc}\n"
     )
     if subtitle_override:
-        user_msg += f"\nSUBTÍTULO DEL ARTISTA (usa este exactamente): {subtitle_override}\n"
+        user_msg += f"\nSUBTÍTULO (usa exactamente): {subtitle_override}\n"
     else:
-        user_msg += "\nSUBTÍTULO: genera uno según las reglas — fractura, no descripción.\n"
+        user_msg += "\nSUBTÍTULO: genera uno — fractura, no descripción.\n"
 
     resp = requests.post(
         f"{GEMINI_FLASH_URL}?key={GEMINI_API_KEY}",
@@ -198,13 +142,13 @@ def build_image_prompt(expanded: dict, style: str, subtitle_override: str) -> di
         timeout=30,
     )
     if resp.status_code != 200:
-        raise Exception(f"Gemini image builder error {resp.status_code}: {resp.text[:200]}")
+        raise Exception(f"Gemini image builder error {resp.status_code}")
     text = resp.json()["candidates"][0]["content"]["parts"][0]["text"]
     return json.loads(text.replace("```json", "").replace("```", "").strip())
 
 
-def generate_image(prompt: str, ratio: str) -> bytes:
-    width, height = RATIO_MAP.get(ratio, (1344, 768))
+def generate_image(prompt, ratio):
+    width, height = RATIO_MAP.get(ratio, (896, 1120))
     headers = {"Authorization": f"Bearer {REPLICATE_TOKEN}", "Content-Type": "application/json"}
     resp = requests.post(
         f"{REPLICATE_API}/models/{FLUX_MODEL}/predictions",
@@ -223,7 +167,7 @@ def generate_image(prompt: str, ratio: str) -> bytes:
     status = prediction.get("status", "")
 
     if not output or status != "succeeded":
-        for i in range(90):
+        for _ in range(90):
             time.sleep(2)
             poll = requests.get(f"{REPLICATE_API}/predictions/{pred_id}", headers=headers, timeout=30)
             if poll.status_code != 200:
@@ -242,11 +186,11 @@ def generate_image(prompt: str, ratio: str) -> bytes:
     image_url = output[0] if isinstance(output, list) else output
     img_resp = requests.get(image_url, timeout=60)
     if img_resp.status_code != 200:
-        raise Exception(f"Error descargando: {img_resp.status_code}")
+        raise Exception(f"Error descargando imagen: {img_resp.status_code}")
     return img_resp.content
 
 
-def compose_subtitle(image_bytes: bytes, subtitle: str) -> bytes:
+def compose_subtitle(image_bytes, subtitle):
     img = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
     W, H = img.size
     gradient = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -260,9 +204,9 @@ def compose_subtitle(image_bytes: bytes, subtitle: str) -> bytes:
     font_size = max(24, int(W * 0.028))
     font = None
     for path in [
-        "C:/Windows/Fonts/georgia.ttf", "C:/Windows/Fonts/Georgia.ttf",
         "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf",
-        "/System/Library/Fonts/Times.ttc",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+        "/usr/share/fonts/truetype/freefont/FreeSerif.ttf",
     ]:
         try:
             font = ImageFont.truetype(path, font_size)
@@ -286,12 +230,10 @@ def compose_subtitle(image_bytes: bytes, subtitle: str) -> bytes:
     if current:
         lines.append(current)
     line_height = int(font_size * 1.5)
-    total_text_h = len(lines) * line_height
-    y_start = H - int(H * 0.06) - total_text_h
+    y_start = H - int(H * 0.06) - len(lines) * line_height
     for i, line in enumerate(lines):
         bbox = draw.textbbox((0, 0), line, font=font)
-        tw = bbox[2] - bbox[0]
-        x = (W - tw) // 2
+        x = (W - (bbox[2] - bbox[0])) // 2
         y = y_start + i * line_height
         draw.text((x + 1, y + 1), line, font=font, fill=(0, 0, 0, 160))
         draw.text((x, y), line, font=font, fill=(232, 224, 208, 220))
@@ -301,116 +243,63 @@ def compose_subtitle(image_bytes: bytes, subtitle: str) -> bytes:
     return buf.getvalue()
 
 
-class ProxyHandler(BaseHTTPRequestHandler):
+@app.route("/health")
+@app.route("/")
+def health():
+    return jsonify({"status": "ok"})
 
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self._cors()
-        self.end_headers()
 
-    def do_GET(self):
-        if self.path in ("/health", "/"):
-            self.send_response(200)
-            self._cors()
-            self.send_header("Content-Type", "application/json")
-            self.end_headers()
-            self.wfile.write(json.dumps({"status": "ok"}).encode())
-        else:
-            self._respond(404, {"error": "not found"})
+@app.route("/generate", methods=["POST"])
+def generate():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "JSON inválido"}), 400
 
-    def do_POST(self):
-        if self.path != "/generate":
-            self._respond(404, {"error": "not found"})
-            return
+    concept  = data.get("concept", "").strip()
+    style    = data.get("style", "cinema")
+    ratio    = data.get("ratio", "4:5")
+    subtitle = data.get("subtitle", "").strip()
 
-        length = int(self.headers.get("Content-Length", 0))
-        body = self.rfile.read(length)
+    if not concept:
+        return jsonify({"error": "concept requerido"}), 400
+
+    print(f"\n  Concepto: {concept[:80]}")
+
+    try:
+        expanded = expand_concept(concept)
+    except Exception as e:
+        return jsonify({"error": f"Error expandiendo concepto: {e}"}), 500
+
+    try:
+        built = build_image_prompt(expanded, style, subtitle)
+    except Exception as e:
+        return jsonify({"error": f"Error construyendo prompt: {e}"}), 500
+
+    final_subtitle = subtitle or built.get("subtitle", "")
+
+    try:
+        image_bytes = generate_image(built["prompt"], ratio)
+    except Exception as e:
+        return jsonify({"error": f"Error generando imagen: {e}"}), 500
+
+    if final_subtitle:
         try:
-            data = json.loads(body)
-        except Exception:
-            self._respond(400, {"error": "JSON inválido"})
-            return
-
-        concept  = data.get("concept", "").strip()
-        style    = data.get("style", "cinema")
-        ratio    = data.get("ratio", "16:9")
-        subtitle = data.get("subtitle", "").strip()
-
-        if not concept:
-            self._respond(400, {"error": "concept requerido"})
-            return
-
-        print(f"\n  Concepto: {concept[:80]}")
-        print(f"  Ratio: {ratio} — Estilo: {style}")
-
-        print(f"  [1/3] Expandiendo tensión filosófica...")
-        try:
-            expanded = expand_concept(concept)
+            image_bytes = compose_subtitle(image_bytes, final_subtitle)
         except Exception as e:
-            self._respond(500, {"error": f"Error expandiendo concepto: {e}"})
-            return
+            print(f"  Warning subtítulo: {e}")
 
-        print(f"  Tensión: {expanded.get('tension', '—')[:80]}")
-        print(f"  Territorio: {expanded.get('territory', '—')}")
-
-        print(f"  [2/3] Construyendo prompt de imagen...")
-        try:
-            built = build_image_prompt(expanded, style, subtitle)
-        except Exception as e:
-            self._respond(500, {"error": f"Error construyendo prompt: {e}"})
-            return
-
-        final_subtitle = subtitle or built.get("subtitle", "")
-
-        print(f"  [3/3] Generando imagen...")
-        try:
-            image_bytes = generate_image(built["prompt"], ratio)
-        except Exception as e:
-            self._respond(500, {"error": f"Error generando imagen: {e}"})
-            return
-
-        if final_subtitle:
-            try:
-                image_bytes = compose_subtitle(image_bytes, final_subtitle)
-            except Exception as e:
-                print(f"  Warning subtítulo: {e}")
-
-        image_b64 = base64.b64encode(image_bytes).decode("utf-8")
-        print(f"  Listo.")
-
-        self._respond(200, {
-            "image":     image_b64,
-            "prompt":    built.get("prompt", ""),
-            "core":      expanded.get("core", ""),
-            "territory": expanded.get("territory", "—"),
-            "tension":   expanded.get("tension", ""),
-            "anchor":    expanded.get("anchor", ""),
-            "subject":   expanded.get("subject", ""),
-            "subtitle":  final_subtitle,
-        })
-
-    def _respond(self, code, data):
-        body = json.dumps(data).encode()
-        self.send_response(code)
-        self._cors()
-        self.send_header("Content-Type", "application/json")
-        self.end_headers()
-        self.wfile.write(body)
-
-    def _cors(self):
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
-
-    def log_message(self, format, *args):
-        pass
+    return jsonify({
+        "image":     base64.b64encode(image_bytes).decode("utf-8"),
+        "prompt":    built.get("prompt", ""),
+        "core":      expanded.get("core", ""),
+        "territory": expanded.get("territory", "—"),
+        "tension":   expanded.get("tension", ""),
+        "anchor":    expanded.get("anchor", ""),
+        "subject":   expanded.get("subject", ""),
+        "subtitle":  final_subtitle,
+    })
 
 
 if __name__ == "__main__":
-    print(f"\n  AI Philosophy — Proxy v13 (Production)")
-    print(f"  PORT: {PORT}")
-    server = HTTPServer(("0.0.0.0", PORT), ProxyHandler)
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        print("\n  Proxy detenido.")
+    print(f"\n  AI Philosophy — Proxy v13 Flask / PORT {PORT}")
+    app.run(host="0.0.0.0", port=PORT)
