@@ -309,9 +309,12 @@ class ProxyHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        # Health check para Railway/Render
         if self.path in ("/health", "/"):
-            self._respond(200, {"status": "ok"})
+            self.send_response(200)
+            self._cors()
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "ok"}).encode())
         else:
             self._respond(404, {"error": "not found"})
 
