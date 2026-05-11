@@ -310,7 +310,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         # Health check para Railway/Render
-        if self.path == "/health":
+        if self.path in ("/health", "/"):
             self._respond(200, {"status": "ok"})
         else:
             self._respond(404, {"error": "not found"})
