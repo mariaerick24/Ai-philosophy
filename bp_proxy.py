@@ -283,12 +283,6 @@ def generate():
     except Exception as e:
         return jsonify({"error": f"Error generando imagen: {e}"}), 500
 
-    if final_subtitle:
-        try:
-            image_bytes = compose_subtitle(image_bytes, final_subtitle)
-        except Exception as e:
-            print(f"  Warning subtítulo: {e}")
-
     return jsonify({
         "image":     base64.b64encode(image_bytes).decode("utf-8"),
         "prompt":    built.get("prompt", ""),
