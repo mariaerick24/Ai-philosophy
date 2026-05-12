@@ -229,8 +229,9 @@ def compose_subtitle(image_bytes, subtitle):
             current = word
     if current:
         lines.append(current)
-    line_height = int(font_size * 1.5)
-    y_start = H - int(H * 0.06) - len(lines) * line_height
+    line_height = int(font_size * 1.6)
+    total_text_h = len(lines) * line_height
+    y_start = H - int(font_size * 2.5) - total_text_h
     for i, line in enumerate(lines):
         bbox = draw.textbbox((0, 0), line, font=font)
         x = (W - (bbox[2] - bbox[0])) // 2
