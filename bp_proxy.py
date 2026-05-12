@@ -201,7 +201,7 @@ def compose_subtitle(image_bytes, subtitle):
         draw_grad.line([(0, H - grad_height + y), (W, H - grad_height + y)], fill=(0, 0, 0, alpha))
     img = Image.alpha_composite(img, gradient)
     draw = ImageDraw.Draw(img)
-    font_size = max(28, int(W * 0.034))
+    font_size = max(48, int(W * 0.056))
     font = None
     for path in [
         "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf",
@@ -231,7 +231,7 @@ def compose_subtitle(image_bytes, subtitle):
         lines.append(current)
     line_height = int(font_size * 1.5)
     total_text_h = len(lines) * line_height
-    y_start = H - int(H * 0.06) - total_text_h
+    y_start = H - int(H * 0.08) - total_text_h
     for i, line in enumerate(lines):
         bbox = draw.textbbox((0, 0), line, font=font)
         x = (W - (bbox[2] - bbox[0])) // 2
