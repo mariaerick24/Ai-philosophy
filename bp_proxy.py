@@ -31,7 +31,7 @@ FLUX_MODEL    = "black-forest-labs/flux-schnell"
 STYLES = {
     "flemish":     "Flemish Renaissance oil painting, rich jewel tones, dramatic chiaroscuro, intricate ornamental detail, Rubens and Van Eyck influence, monumental composition, aged impasto texture, deep shadows, luminous golden light, museum quality",
     "moreau":      "Gustave Moreau symbolist oil painting, mythological grandeur, dense ornamental surfaces, luminous jewel-like colors, dreamlike layered atmosphere, Pre-Raphaelite influence, mysterious narrative depth, jeweled figures, museum quality",
-    "cinema":      "CINEMATIC — detect the cinematic register the concept demands and build from there. Available registers: (1) NOIR: urban night, hard shadows, wet streets, moral ambiguity, Blade Runner / Se7en aesthetic; (2) EPIC/SUBLIME: vast landscape, golden hour, lone figure OR massive crowd OR animal migration, Terrence Malick / Roger Deakins; (3) INTIMATE DRAMA: close interior, window light, human face or animal in private moment, Wong Kar-wai / Alfonso Cuarón; (4) DYSTOPIAN/SCI-FI: cold industrial light, surveillance, dehumanized space, Tarkovsky / Children of Men; (5) NEOREALISM: raw street, available light, unposed crowd or community, Cassavetes / Bicycle Thieves; (6) PSYCHOLOGICAL THRILLER: claustrophobic space, destabilizing angle, dread in ordinary setting, Kubrick / Haneke; (7) POLITICAL DRAMA: collective protest, institutional power, masses vs system, Loach / Costa-Gavras / Eisenstein. SUBJECT RANGE: do not default to solitary human figure. Always: anamorphic lens, 35mm film grain, cinematic color grading.",
+    "cinema":      "CINEMATIC — detect the cinematic register the concept demands and build from there. Available registers: (1) NOIR: urban night, hard shadows, wet streets, moral ambiguity, Blade Runner / Se7en aesthetic; (2) EPIC/SUBLIME: vast landscape, golden hour, lone figure OR massive crowd OR animal migration, Terrence Malick / Roger Deakins; (3) INTIMATE DRAMA: close interior, warm window light, human face or hands or body in private moment, child or elder or animal, Wong Kar-wai / Alfonso Cuarón / Hirokazu Kore-eda — USE THIS REGISTER MORE, it is underrepresented; (4) DYSTOPIAN/SCI-FI: cold industrial light, surveillance, dehumanized space, Tarkovsky / Children of Men; (5) NEOREALISM: raw street, available light, unposed crowd or community, family or neighbors, Cassavetes / Bicycle Thieves / Pasolini; (6) PSYCHOLOGICAL THRILLER: claustrophobic space, destabilizing angle, dread in ordinary setting, Kubrick / Haneke; (7) POLITICAL DRAMA: collective protest, institutional power, masses vs system, Loach / Costa-Gavras / Eisenstein; (8) TECHNOLOGY & SCREEN: human beings in relationship with screens, devices, interfaces, data — not dystopian but ambiguous, intimate or alienating depending on concept, Spike Jonze / Michel Gondry / Black Mirror calm episodes — phones as mirrors, screens as windows, code as landscape, light from devices on human faces; (9) URBAN STREET LIFE: the street as philosophical space — not protest, but daily life, vendors, commuters, children playing, rain on pavement, neon reflections, bodies in motion, city as living organism, Wong Kar-wai street / Edward Yang / Jia Zhangke. BALANCE RULE: registers (3) INTIMATE DRAMA, (5) NEOREALISM, (8) TECHNOLOGY, and (9) URBAN STREET are chronically underused — actively favor them. Registers (4) and (7) are overused — only when concept explicitly demands it. SUBJECT RANGE: hands, faces, domestic objects, children, elders, animals in human spaces, communities, devices, streets. Always: anamorphic lens, 35mm film grain, cinematic color grading.",
     "typographic": "stark typographic graphic design, bold serif display text as primary visual element, extreme high contrast black and white photography, editorial brutalist layout, Barbara Kruger influence, raw confrontational composition",
     "documentary": "documentary black and white photography, raw photojournalism, Cartier-Bresson decisive moment, Sebastião Salgado influence, heavy 35mm film grain, honest unfiltered natural light, street photography intimacy",
     "cosmic":      "vast cosmic scale photography, lone human figure dwarfed by universe, nebulae and deep star fields, Hubble Space Telescope aesthetic, sublime existential scale, monochrome figure against infinite color cosmos",
@@ -60,11 +60,28 @@ CAPA 3 — SUJETO:
   REGLA: figura_individual es el último recurso.
 CAPA 4 — TERRITORIO: sublime | cotidiano | sociopolítico
 
+EQUILIBRIO TERRITORIAL — REGLA CRÍTICA:
+El territorio sociopolítico está sobrerepresentado. Antes de elegirlo, pregúntate:
+¿El concepto realmente exige poder, política o conflicto colectivo?
+Si no, elige cotidiano o sublime.
+
+TERRITORIO COTIDIANO es válido para: tiempo, memoria, cuerpo, rutina, silencio,
+objetos, espacios domésticos, relaciones, trabajo, comida, sueño, infancia, vejez.
+Es el territorio más subutilizado — úsalo más.
+
+TERRITORIO SUBLIME es válido para: escala, cosmos, naturaleza, lo que excede al individuo,
+fenómenos naturales, muerte, eternidad, vacío, lo inconmensurable.
+
+TERRITORIO SOCIOPOLÍTICO solo cuando el concepto exige explícitamente:
+poder institucional, conflicto colectivo, desigualdad, control, resistencia.
+
 REGISTRO EMOCIONAL — REGLA ESPECIAL:
-Cuando el concepto tiene carga humana directa (madre, hijo, duelo, amor, familia):
+Cuando el concepto tiene carga humana directa (madre, hijo, duelo, amor, familia,
+cuerpo, tacto, ternura, comunidad, rutina, infancia, vejez, amistad):
   - Drama íntimo antes que político
   - Cotidiano o sublime emocional antes que sociopolítico
-  - Cinematográfico → sub-registro INTIMATE DRAMA: Wong Kar-wai / Cuarón / Kiarostami
+  - Cinematográfico → sub-registro INTIMATE DRAMA: Wong Kar-wai / Cuarón / Kore-eda
+  - Calidez, cercanía, escala humana — no frialdad institucional
 
 Responde SOLO con JSON válido, sin markdown:
 {
@@ -117,7 +134,7 @@ def expand_concept(concept):
     return json.loads(text.replace("```json", "").replace("```", "").strip())
 
 
-def build_image_prompt(expanded, style, subtitle_override):
+def build_image_prompt(expanded, style, subtitle_override, visual_guide=""):
     style_desc = STYLES.get(style, STYLES["cinema"])
     user_msg = (
         f"TENSIÓN: {expanded['tension']}\n"
@@ -126,6 +143,8 @@ def build_image_prompt(expanded, style, subtitle_override):
         f"TERRITORIO: {expanded['territory']}\n"
         f"REGISTRO: {style_desc}\n"
     )
+    if visual_guide:
+        user_msg += f"\nGUÍA VISUAL DEL ARTISTA (incorpora esto en el prompt de imagen): {visual_guide}\n"
     if subtitle_override:
         user_msg += f"\nSUBTÍTULO (usa exactamente): {subtitle_override}\n"
     else:
@@ -256,10 +275,11 @@ def generate():
     if not data:
         return jsonify({"error": "JSON inválido"}), 400
 
-    concept  = data.get("concept", "").strip()
-    style    = data.get("style", "cinema")
-    ratio    = data.get("ratio", "4:5")
-    subtitle = data.get("subtitle", "").strip()
+    concept     = data.get("concept", "").strip()
+    style       = data.get("style", "cinema")
+    ratio       = data.get("ratio", "4:5")
+    subtitle    = data.get("subtitle", "").strip()
+    visual_guide = data.get("visualGuide", "").strip()
 
     if not concept:
         return jsonify({"error": "concept requerido"}), 400
@@ -272,7 +292,7 @@ def generate():
         return jsonify({"error": f"Error expandiendo concepto: {e}"}), 500
 
     try:
-        built = build_image_prompt(expanded, style, subtitle)
+        built = build_image_prompt(expanded, style, subtitle, visual_guide)
     except Exception as e:
         return jsonify({"error": f"Error construyendo prompt: {e}"}), 500
 
