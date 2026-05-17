@@ -117,7 +117,7 @@ Responde SOLO con JSON válido, sin markdown:
   "subject": "colectivo_en_tension|animal|objeto_espacio|celeste|dualidad|monumental|figura_individual",
   "subject_note": "descripción concreta — 10 palabras máximo",
   "territory": "sublime|cotidiano|sociopolítico",
-  "core": "núcleo filosófico en español — una línea"
+  "core": "núcleo filosófico en español — una línea — NO siempre paradoja, puede ser imagen, pregunta, declaración o límite"
 }"""
 
 IMAGE_SYSTEM = """Eres el constructor visual de AI Philosophy.
