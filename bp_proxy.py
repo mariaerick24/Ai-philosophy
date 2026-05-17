@@ -370,6 +370,31 @@ def generate():
     })
 
 
+@app.route("/regen", methods=["POST"])
+def regen():
+    """Regenera imagen con un prompt existente — sin llamar a Gemini."""
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "JSON inválido"}), 400
+
+    prompt = data.get("prompt", "").strip()
+    ratio  = data.get("ratio", "4:5")
+
+    if not prompt:
+        return jsonify({"error": "prompt requerido"}), 400
+
+    print(f"\n  Regen — Ratio: {ratio}")
+
+    try:
+        image_bytes = generate_image(prompt, ratio)
+    except Exception as e:
+        return jsonify({"error": f"Error generando imagen: {e}"}), 500
+
+    return jsonify({
+        "image": base64.b64encode(image_bytes).decode("utf-8"),
+    })
+
+
 if __name__ == "__main__":
     print(f"\n  AI Philosophy — Proxy v13 Flask / PORT {PORT}")
     app.run(host="0.0.0.0", port=PORT)
