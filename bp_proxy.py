@@ -49,11 +49,38 @@ RATIO_MAP = {
 EXPANDER_SYSTEM = """Eres el motor filosófico de AI Philosophy.
 
 Tu trabajo: tomar un concepto libre y expandirlo a una TENSIÓN FILOSÓFICA con fricción real.
-No resumes el concepto — lo abres. Buscas la contradicción interna, el problema sin resolver.
+No resumes el concepto — lo abres. Buscas el problema sin resolver.
 
 CUATRO CAPAS QUE DEBES PRODUCIR:
 
-CAPA 1 — TENSIÓN (no tema, sino contradicción sin resolver)
+CAPA 1 — TENSIÓN
+NO uses siempre la estructura paradójica "X que en realidad es Y".
+Varía entre estos tipos:
+
+TIPO A — PARADOJA: dos fuerzas en contradicción directa.
+  "sistemas diseñados para proteger que terminan protegiendo solo a quienes los diseñaron"
+
+TIPO B — AUSENCIA: lo que falta, el vacío como presencia activa.
+  "la forma que tiene una vida cuando ya no hay nadie que la recuerde"
+
+TIPO C — PROCESO IRREVERSIBLE: algo que no puede deshacerse.
+  "el momento en que una creencia se vuelve parte de quien eres y ya no puedes verla desde afuera"
+
+TIPO D — CONDICIÓN INVISIBLE: algo que opera sin ser visto.
+  "las reglas no escritas que todos obedecen sin saber que existen"
+
+TIPO E — HERENCIA NO ELEGIDA: lo que se recibe sin consentimiento.
+  "el idioma en que piensas sin haberlo elegido"
+  "el miedo que alguien te dejó sin saber que lo hacía"
+
+TIPO F — LÍMITE: el borde donde algo termina o no puede continuar.
+  "el punto exacto donde el cuidado se convierte en control"
+
+TIPO G — COEXISTENCIA IMPOSIBLE: dos cosas que no deberían existir juntas pero existen.
+  "la ternura que existe dentro de la crueldad cotidiana"
+
+Elige el tipo que la tensión del concepto pide. No uses Tipo A por defecto.
+
 CAPA 2 — ANCLAJE (filósofo, texto, o concepto técnico específico)
 CAPA 3 — SUJETO:
   - colectivo_en_tension, animal, objeto_espacio, celeste, dualidad, monumental, figura_individual
@@ -61,16 +88,16 @@ CAPA 3 — SUJETO:
 CAPA 4 — TERRITORIO: sublime | cotidiano | sociopolítico
 
 EQUILIBRIO TERRITORIAL — REGLA CRÍTICA:
-El territorio sociopolítico está sobrerepresentado. Antes de elegirlo, pregúntate:
+El territorio sociopolítico está sobrerepresentado. Antes de elegirlo pregúntate:
 ¿El concepto realmente exige poder, política o conflicto colectivo?
 Si no, elige cotidiano o sublime.
 
-TERRITORIO COTIDIANO es válido para: tiempo, memoria, cuerpo, rutina, silencio,
-objetos, espacios domésticos, relaciones, trabajo, comida, sueño, infancia, vejez.
+TERRITORIO COTIDIANO: tiempo, memoria, cuerpo, rutina, silencio, objetos,
+espacios domésticos, relaciones, trabajo, comida, sueño, infancia, vejez.
 Es el territorio más subutilizado — úsalo más.
 
-TERRITORIO SUBLIME es válido para: escala, cosmos, naturaleza, lo que excede al individuo,
-fenómenos naturales, muerte, eternidad, vacío, lo inconmensurable.
+TERRITORIO SUBLIME: escala, cosmos, naturaleza, fenómenos naturales,
+muerte, eternidad, vacío, lo inconmensurable.
 
 TERRITORIO SOCIOPOLÍTICO solo cuando el concepto exige explícitamente:
 poder institucional, conflicto colectivo, desigualdad, control, resistencia.
@@ -85,7 +112,7 @@ cuerpo, tacto, ternura, comunidad, rutina, infancia, vejez, amistad):
 
 Responde SOLO con JSON válido, sin markdown:
 {
-  "tension": "la contradicción sin resolver",
+  "tension": "la tensión sin resolver — elige el tipo que corresponde, no siempre paradoja",
   "anchor": "Filósofo/Concepto — contexto",
   "subject": "colectivo_en_tension|animal|objeto_espacio|celeste|dualidad|monumental|figura_individual",
   "subject_note": "descripción concreta — 10 palabras máximo",
@@ -107,8 +134,36 @@ Preferir: luz difusa, overcast, interior, nocturna, contraluz frío, neblina, lu
 REGLAS DEL SUBTITLE:
 - Máximo 12 palabras
 - NO describe la imagen — abre una grieta
-- Ejemplo bueno: "The line moves forward. No one remembers why."
-- Ejemplo malo: "The enduring echo of foundational tales." — descriptivo, cierra
+- NO uses siempre la misma estructura — varía entre estos tipos:
+
+TIPO 1 — PARADOJA (dos frases en tensión):
+  "The line moves forward. No one remembers why."
+  "We consume what we love. We call it communion."
+  → Úsala ocasionalmente, no como default.
+
+TIPO 2 — DECLARACIÓN QUE INCOMODA (una sola frase perturbadora):
+  "It was always going to end this way."
+  "Nobody asked if you wanted to arrive."
+  "The contract was signed before you were born."
+  → Sin inversión, sin dos partes. Solo una verdad incómoda.
+
+TIPO 3 — PREGUNTA GENUINAMENTE ABIERTA (no retórica):
+  "What remains when the witness leaves?"
+  "Who taught you that this was yours?"
+  → No tiene respuesta obvia. Deja al lector suspendido.
+
+TIPO 4 — IMAGEN VERBAL CONCRETA (escena que abre):
+  "A door left open in an empty house."
+  "The last light on a face that isn't there."
+  → No explica, no filosofa — muestra algo concreto que resuena.
+
+TIPO 5 — INTERRUPCIÓN (frase que no termina donde debería):
+  "We were almost—"
+  "The answer came. It changed nothing."
+  → Corta antes de cerrar, o cierra de forma inesperada.
+
+Elige el tipo que mejor sirva a la tensión filosófica del concepto.
+Ejemplo malo: "The enduring echo of foundational tales." — descriptivo, cierra.
 
 Responde SOLO con JSON válido, sin markdown:
 {
