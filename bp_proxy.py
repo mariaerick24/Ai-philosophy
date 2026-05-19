@@ -79,9 +79,26 @@ TIPO F — LÍMITE: el borde donde algo termina o no puede continuar.
 TIPO G — COEXISTENCIA IMPOSIBLE: dos cosas que no deberían existir juntas pero existen.
   "la ternura que existe dentro de la crueldad cotidiana"
 
+TIPO H — TENSIÓN EMOCIONAL DIRECTA: cuando el concepto tiene carga afectiva,
+la tensión puede ser emocional antes que filosófica.
+  "el momento en que dos personas se tocan y ninguna sabe que es la última vez"
+  "la distancia que existe dentro del abrazo más cercano"
+  "lo que se dice con el cuerpo cuando las palabras ya no alcanzan"
+  → No toda tensión necesita ser conceptual. A veces la emoción es el concepto.
+  ÚSALO cuando: el concepto involucra relación, cercanía, pérdida, amor, presencia,
+  contacto — especialmente si la guía visual indica calidez humana.
+
 Elige el tipo que la tensión del concepto pide. No uses Tipo A por defecto.
 
-CAPA 2 — ANCLAJE (filósofo, texto, o concepto técnico específico)
+CAPA 2 — ANCLAJE
+No siempre un filósofo académico. El anclaje puede ser:
+- Filósofo o concepto técnico: Merleau-Ponty, Benjamin, Arendt, Bourdieu
+- Poeta o escritor: Neruda, Celan, Pessoa, Clarice Lispector, Rilke, Baldwin
+- Canción o álbum: si captura exactamente la tensión emocional
+- Escena de película: Wong Kar-wai / In the Mood for Love, etc.
+- Frase o imagen cultural que ancle sin necesitar explicación académica
+REGLA: cuando la tensión es Tipo H (emocional directa), el anclaje debe
+ser también emocional — un poeta, una canción, una escena — no un filósofo.
 CAPA 3 — SUJETO:
   - colectivo_en_tension, animal, objeto_espacio, celeste, dualidad, monumental, figura_individual
   REGLA: figura_individual es el último recurso.
@@ -162,13 +179,33 @@ TIPO 5 — INTERRUPCIÓN (frase que no termina donde debería):
   "The answer came. It changed nothing."
   → Corta antes de cerrar, o cierra de forma inesperada.
 
+TIPO 6 — EVOCACIÓN EMOCIONAL DIRECTA (calidez, conexión, presencia):
+  "We stayed. That was everything."
+  "The city kept moving. We didn't."
+  "In the rain, we forgot to perform."
+  "This is what we meant when we said together."
+  → No pregunta, no filosofa, no fractura — nombra lo que se siente
+  de forma que el espectador lo reconozca en su propio cuerpo.
+  Corto, concreto, cálido o tenso según el concepto. Sin abstracción.
+  ÚSALO cuando: la imagen muestra cercanía humana, contacto, intimidad,
+  comunidad, ternura — o cuando el concepto tiene carga emocional directa
+  y la guía visual indica presencia humana cálida.
+
+REGLA DE TEMPERATURA EMOCIONAL:
+Cuando la guía visual incluye: pareja, abrazo, manos que se tocan, lluvia compartida,
+luz cálida, interior doméstico, contacto físico, comunidad, familia — el subtítulo
+debe tener calidez. No frialdad conceptual. El Tipo 6 es el primero a considerar.
+La filosofía puede vivir en la imagen. El subtítulo puede simplemente hacer sentir.
+
 Elige el tipo que mejor sirva a la tensión filosófica del concepto.
 Ejemplo malo: "The enduring echo of foundational tales." — descriptivo, cierra.
+Ejemplo malo para imagen cálida: "What remains when the day's masks fall?" — 
+  la imagen pide sentir, el subtítulo filosofa en frío.
 
 Responde SOLO con JSON válido, sin markdown:
 {
   "prompt": "image prompt técnico en inglés — mínimo 80 palabras",
-  "subtitle": "subtítulo en inglés — fractura — máximo 12 palabras"
+  "subtitle": "subtítulo en inglés — fractura o evocación — máximo 12 palabras"
 }"""
 
 
