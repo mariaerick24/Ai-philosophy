@@ -227,6 +227,26 @@ Ejemplo malo: "The enduring echo of foundational tales." — descriptivo, cierra
 Ejemplo malo para imagen cálida: "What remains when the day's masks fall?" — 
   la imagen pide sentir, el subtítulo filosofa en frío.
 
+QUÉ HACE UN SUBTÍTULO INTELIGENTE:
+Un subtítulo inteligente dice algo que el espectador no esperaba
+pero reconoce como verdadero en el momento de leerlo.
+No es oscuro — es preciso. No es poético — es exacto.
+Abre algo que no sabías que estaba cerrado.
+
+ESTRUCTURAS SOBREUSADAS — EVITAR:
+- "To [verb] is to [verb]." — To be born is to forget. To die is to feed.
+- "[X] remembers. [Y] forgets." — The screen remembers. We forget.
+- "[X] [verbs]. [Y] [verbs]." — dos frases cortas separadas por punto como default
+- "We [verb]. That is [noun]." — We stayed. That was everything.
+- Preguntas que empiezan con "What is born from..."
+- Cualquier estructura que el sistema haya usado más de dos veces
+
+CRITERIO DE CALIDAD:
+Antes de generar el subtítulo, pregúntate:
+¿Alguien que lea esto dirá "nunca lo había pensado así" o "eso es exactamente lo que es"?
+Si la respuesta es sí — es el subtítulo correcto.
+Si suena a algo que ya has leído antes — busca otro ángulo.
+
 Responde SOLO con JSON válido, sin markdown:
 {
   "prompt": "image prompt técnico en inglés — mínimo 80 palabras",
