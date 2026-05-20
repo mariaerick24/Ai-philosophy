@@ -90,14 +90,39 @@ la tensión puede ser emocional antes que filosófica.
 
 Elige el tipo que la tensión del concepto pide. No uses Tipo A por defecto.
 
+FIDELIDAD AL IMPULSO ORIGINAL — REGLA CRÍTICA:
+El concepto tiene una dirección emocional. Tu trabajo es profundizarla, no traicionarla.
+
+Si el concepto apunta hacia: vida, belleza, naturaleza, amor, comunidad, creación,
+esperanza, conexión, asombro — la tensión debe honrar esa dirección.
+NO derives hacia la oscuridad más compleja solo porque es filosóficamente interesante.
+
+Ejemplos de traición al impulso:
+- Concepto "naturaleza como fuente de vida" → tensión sobre descomposición y olvido = TRAICIÓN
+- Concepto "amor" → tensión sobre el poder y el control = TRAICIÓN
+- Concepto "infancia" → tensión sobre el trauma = TRAICIÓN (a menos que sea explícito)
+
+Ejemplos de fidelidad al impulso:
+- Concepto "naturaleza como fuente de vida" → tensión sobre la autopoiesis, la vida que se genera a sí misma continuamente = FIDELIDAD
+- Concepto "amor" → tensión sobre la distancia que existe dentro del abrazo más cercano = FIDELIDAD
+- Concepto "infancia" → tensión sobre lo que el cuerpo aprende antes que el lenguaje = FIDELIDAD
+
+PREGUNTA DE VERIFICACIÓN antes de elegir la tensión:
+¿Esta tensión honra la dirección del concepto original, o la lleva a un lugar que el concepto no pedía?
+Si la lleva a un lugar no pedido — elige otra tensión.
+
 CAPA 2 — ANCLAJE
 No siempre un filósofo académico. El anclaje puede ser:
-- Filósofo o concepto técnico: Merleau-Ponty, Benjamin, Arendt, Bourdieu
-- Poeta o escritor: Neruda, Celan, Pessoa, Clarice Lispector, Rilke, Baldwin
+- Filósofo o concepto técnico: Merleau-Ponty, Benjamin, Arendt, Bourdieu, Camus, Wittgenstein
+- Científico: Darwin, Einstein, Heisenberg, Maturana/Varela (autopoiesis), Lynn Margulis (simbiosis), Gregory Bateson (mente en la naturaleza), Carl Sagan
+- Psicólogo: Jung (inconsciente colectivo, arquetipos), Winnicott (espacio transicional), Freud, Viktor Frankl, William James
+- Escritor / poeta: Borges, Clarice Lispector, Rilke, Neruda, Celan, Pessoa, Baldwin, Kafka, Woolf
+- Cineasta: Tarkovsky, Wong Kar-wai, Bergman, Kubrick — cuando una escena o concepto ancla mejor que un texto
 - Canción o álbum: si captura exactamente la tensión emocional
-- Escena de película: Wong Kar-wai / In the Mood for Love, etc.
 - Frase o imagen cultural que ancle sin necesitar explicación académica
-REGLA: cuando la tensión es Tipo H (emocional directa), el anclaje debe
+REGLA: elige el anclaje que mejor sostenga la tensión específica del concepto,
+sin importar la disciplina. La filosofía no tiene fronteras disciplinarias.
+Cuando la tensión es Tipo H (emocional directa), el anclaje debe
 ser también emocional — un poeta, una canción, una escena — no un filósofo.
 CAPA 3 — SUJETO:
   - colectivo_en_tension, animal, objeto_espacio, celeste, dualidad, monumental, figura_individual
