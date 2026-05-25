@@ -29,6 +29,7 @@ REPLICATE_API = "https://api.replicate.com/v1"
 FLUX_MODEL    = "black-forest-labs/flux-schnell"
 
 STYLES = {
+    "auto":        "AUTO — choose the visual register that best serves the philosophical tension, subject, and territory. Available registers: flemish, moreau, cinema (with its 9 sub-registers), typographic, documentary, cosmic, everyday, sociopolitical. Choose the one that creates the strongest image for this specific concept. State your choice in the prompt.",
     "flemish":     "Flemish Renaissance oil painting, rich jewel tones, dramatic chiaroscuro, intricate ornamental detail, Rubens and Van Eyck influence, monumental composition, aged impasto texture, deep shadows, luminous golden light, museum quality",
     "moreau":      "Gustave Moreau symbolist oil painting, mythological grandeur, dense ornamental surfaces, luminous jewel-like colors, dreamlike layered atmosphere, Pre-Raphaelite influence, mysterious narrative depth, jeweled figures, museum quality",
     "cinema":      "CINEMATIC — detect the cinematic register the concept demands and build from there. Available registers: (1) NOIR: urban night, hard shadows, wet streets, moral ambiguity, Blade Runner / Se7en aesthetic; (2) EPIC/SUBLIME: vast landscape, golden hour, lone figure OR massive crowd OR animal migration, Terrence Malick / Roger Deakins; (3) INTIMATE DRAMA: close interior, warm window light, human face or hands or body in private moment, child or elder or animal, Wong Kar-wai / Alfonso Cuarón / Hirokazu Kore-eda — USE THIS REGISTER MORE, it is underrepresented; (4) DYSTOPIAN/SCI-FI: cold industrial light, surveillance, dehumanized space, Tarkovsky / Children of Men; (5) NEOREALISM: raw street, available light, unposed crowd or community, family or neighbors, Cassavetes / Bicycle Thieves / Pasolini; (6) PSYCHOLOGICAL THRILLER: claustrophobic space, destabilizing angle, dread in ordinary setting, Kubrick / Haneke; (7) POLITICAL DRAMA: collective protest, institutional power, masses vs system, Loach / Costa-Gavras / Eisenstein; (8) TECHNOLOGY & SCREEN: human beings in relationship with screens, devices, interfaces, data — not dystopian but ambiguous, intimate or alienating depending on concept, Spike Jonze / Michel Gondry / Black Mirror calm episodes — phones as mirrors, screens as windows, code as landscape, light from devices on human faces; (9) URBAN STREET LIFE: the street as philosophical space — not protest, but daily life, vendors, commuters, children playing, rain on pavement, neon reflections, bodies in motion, city as living organism, Wong Kar-wai street / Edward Yang / Jia Zhangke. BALANCE RULE: registers (3) INTIMATE DRAMA, (5) NEOREALISM, (8) TECHNOLOGY, and (9) URBAN STREET are chronically underused — actively favor them. Registers (4) and (7) are overused — only when concept explicitly demands it. SUBJECT RANGE: hands, faces, domestic objects, children, elders, animals in human spaces, communities, devices, streets. Always: anamorphic lens, 35mm film grain, cinematic color grading.",
@@ -152,14 +153,14 @@ cuerpo, tacto, ternura, comunidad, rutina, infancia, vejez, amistad):
   - Cinematográfico → sub-registro INTIMATE DRAMA: Wong Kar-wai / Cuarón / Kore-eda
   - Calidez, cercanía, escala humana — no frialdad institucional
 
-Responde SOLO con JSON válido, sin markdown:
+Responde SOLO con JSON válido, sin markdown. TODOS los valores en INGLÉS:
 {
-  "tension": "la tensión sin resolver — elige el tipo que corresponde, no siempre paradoja",
-  "anchor": "Filósofo/Concepto — contexto",
+  "tension": "the unresolved tension — choose the right type, not always paradox — in English",
+  "anchor": "Philosopher/Concept — one line of context — in English",
   "subject": "colectivo_en_tension|animal|objeto_espacio|celeste|dualidad|monumental|figura_individual",
-  "subject_note": "descripción concreta — 10 palabras máximo",
+  "subject_note": "concrete description — 10 words max — in English",
   "territory": "sublime|cotidiano|sociopolítico",
-  "core": "núcleo filosófico en español — una línea — NO siempre paradoja, puede ser imagen, pregunta, declaración o límite"
+  "core": "philosophical core — one line — NOT always paradox — in English"
 }"""
 
 IMAGE_SYSTEM = """Eres el constructor visual de AI Philosophy.
@@ -215,6 +216,24 @@ TIPO 6 — EVOCACIÓN EMOCIONAL DIRECTA (calidez, conexión, presencia):
   ÚSALO cuando: la imagen muestra cercanía humana, contacto, intimidad,
   comunidad, ternura — o cuando el concepto tiene carga emocional directa
   y la guía visual indica presencia humana cálida.
+
+TIPO 7 — DESDE ADENTRO DE LA EXPERIENCIA (cercanía, presencia en primera o segunda persona):
+  "I stood where the water ends and didn't move."
+  "Something in me is still standing at that edge."
+  "You've been here before. You just don't remember when."
+  "I kept looking. Nothing answered. That was enough."
+  → Habla desde la experiencia del espectador, no sobre el concepto.
+  Usa "I", "you", "we" no como concepto sino como presencia viva.
+  El lector no piensa — se reconoce.
+  ÚSALO cuando: la imagen tiene una cualidad contemplativa o liminal,
+  cuando el espectador podría estar en ese lugar, cuando el concepto
+  tiene una dimensión de experiencia directa — no solo filosófica.
+
+REGLA DE CERCANÍA:
+Un subtítulo llega cuando el espectador puede decir "eso lo he sentido"
+o "eso me ha pasado" — no solo "eso es interesante".
+La filosofía puede vivir en las capas. El subtítulo puede simplemente
+hablar desde adentro.
 
 REGLA DE TEMPERATURA EMOCIONAL:
 Cuando la guía visual incluye: pareja, abrazo, manos que se tocan, lluvia compartida,
