@@ -273,13 +273,19 @@ Responde SOLO con JSON válido, sin markdown:
 }"""
 
 
-def expand_concept(concept):
+def expand_concept(concept, anchor_override="", subject_override="auto"):
+    user_input = f"Concept: {concept}"
+    if anchor_override:
+        user_input += f"\nANCHOR (use this exactly, do not change it): {anchor_override}"
+    if subject_override and subject_override != "auto":
+        user_input += f"\nSUBJECT (use this exactly, do not change it): {subject_override}"
+
     resp = requests.post(
         f"{GEMINI_FLASH_URL}?key={GEMINI_API_KEY}",
         headers={"Content-Type": "application/json"},
         json={
             "systemInstruction": {"parts": [{"text": EXPANDER_SYSTEM}]},
-            "contents": [{"parts": [{"text": f"Concepto: {concept}"}]}],
+            "contents": [{"parts": [{"text": user_input}]}],
             "generationConfig": {"temperature": 0.9, "responseMimeType": "application/json"}
         },
         timeout=30,
@@ -425,25 +431,83 @@ def health():
     return jsonify({"status": "ok"})
 
 
+IMAGE_ANALYSIS_SYSTEM = """You are a philosophical reader of images for AI Philosophy.
+
+Look at the image and extract its philosophical potential.
+Describe what you see in terms of:
+- The emotional or existential tension present
+- What the image suggests about human experience, time, nature, or society
+- The mood, light, subject, and atmosphere
+
+Respond with a single paragraph in English — concrete, philosophical, no more than 60 words.
+This will be used as the philosophical concept to generate a new image."""
+
+
+def analyze_image(image_base64: str) -> str:
+    """Uses Gemini Vision to read an image philosophically."""
+    resp = requests.post(
+        f"{GEMINI_FLASH_URL}?key={GEMINI_API_KEY}",
+        headers={"Content-Type": "application/json"},
+        json={
+            "systemInstruction": {"parts": [{"text": IMAGE_ANALYSIS_SYSTEM}]},
+            "contents": [{
+                "parts": [
+                    {
+                        "inline_data": {
+                            "mime_type": "image/jpeg",
+                            "data": image_base64
+                        }
+                    },
+                    {"text": "Read this image philosophically."}
+                ]
+            }],
+            "generationConfig": {"temperature": 0.8}
+        },
+        timeout=30,
+    )
+    if resp.status_code != 200:
+        raise Exception(f"Gemini vision error {resp.status_code}")
+    return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+
+
 @app.route("/generate", methods=["POST"])
 def generate():
     data = request.get_json()
     if not data:
         return jsonify({"error": "JSON inválido"}), 400
 
-    concept     = data.get("concept", "").strip()
-    style       = data.get("style", "cinema")
-    ratio       = data.get("ratio", "4:5")
-    subtitle    = data.get("subtitle", "").strip()
-    visual_guide = data.get("visualGuide", "").strip()
+    concept          = data.get("concept", "").strip()
+    style            = data.get("style", "cinema")
+    ratio            = data.get("ratio", "4:5")
+    subtitle         = data.get("subtitle", "").strip()
+    visual_guide     = data.get("visualGuide", "").strip()
+    anchor_override  = data.get("anchorOverride", "").strip()
+    subject_override = data.get("subjectOverride", "auto").strip()
+    image_base64     = data.get("imageBase64", "").strip()
+
+    # If image uploaded, analyze it philosophically and use as concept
+    if image_base64:
+        print(f"  [Vision] Analyzing uploaded image...")
+        try:
+            vision_concept = analyze_image(image_base64)
+            print(f"  Vision concept: {vision_concept[:80]}")
+            # Prepend vision reading to concept if both provided
+            if concept:
+                concept = f"{vision_concept}. Additional context: {concept}"
+            else:
+                concept = vision_concept
+        except Exception as e:
+            print(f"  Warning vision: {e}")
+            if not concept:
+                return jsonify({"error": f"Image analysis failed: {e}"}), 500
 
     if not concept:
-        return jsonify({"error": "concept requerido"}), 400
+        return jsonify({"error": "concept or image required"}), 400
 
     print(f"\n  Concepto: {concept[:80]}")
 
     try:
-        expanded = expand_concept(concept)
+        expanded = expand_concept(concept, anchor_override, subject_override)
     except Exception as e:
         return jsonify({"error": f"Error expandiendo concepto: {e}"}), 500
 
